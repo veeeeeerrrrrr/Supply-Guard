@@ -25,8 +25,20 @@ from langchain.chains import LLMChain
 
 def get_llm(temperature: float = 0.7):
     api_key = os.getenv("GOOGLE_API_KEY")
+
     if not api_key:
-        raise ValueError("GOOGLE_API_KEY not set. Get a free key at https://aistudio.google.com/apikey")
+        try:
+            import streamlit as st
+            api_key = st.secrets.get("GOOGLE_API_KEY")
+        except Exception:
+            pass
+
+    if not api_key:
+        raise ValueError(
+            "GOOGLE_API_KEY not set. Add it to .env locally "
+            "or Streamlit Secrets when deployed."
+        )
+
     return ChatGoogleGenerativeAI(
         model="gemini-3.1-flash-lite-preview",
         google_api_key=api_key,
